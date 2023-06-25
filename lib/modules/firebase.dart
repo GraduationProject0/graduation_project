@@ -1,57 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 //import 'database.dart';
 FirebaseFirestore db = FirebaseFirestore.instance;
 
 Future<bool> addUsers(
-    String Fname,
-    String Lname,
-    String email,
-    String phone,
-    String birth,
-    String password,
-    String confirmPassword )async {
-
+    String add_Fname,
+    String add_Lname,
+    String add_email,
+    String add_phone,
+    String add_birth,
+    String add_password,
+    String add_confirmPassword) async {
   bool isAdded = false;
 
-  // String gender ="";
-
-  // if (genderVal == 1)
-  // {
-  //   gender = "Male";
-  // }
-  // else if (genderVal == 2)
-  // {
-  //   gender = "Female";
-  // }
-
-  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore
+      .instance
       .collection('users')
-      //.where('Phone', isEqualTo: phone)
-      .where('E-Mail', isEqualTo: email)
+      .where('E-Mail', isEqualTo: add_email)
       .get();
 
-  if (querySnapshot.size == 0 && password==confirmPassword) {
+  if (querySnapshot.size == 0 && add_password == add_confirmPassword) {
+    final user = <String, dynamic>{
+      "FName": add_Fname,
+      "LName": add_Lname,
+      "E-Mail": add_email,
+      "Phone": add_phone,
+      "Birth": add_birth,
+      "Password": add_password,
+    };
 
-    // if(name != "" && email != "" && phone != "" && birth != "")
-    // {
-      final user = <String, dynamic>{
-        "FName": Fname,
-        "LName": Lname,
-        "E-Mail": email,
-        "Phone": phone,
-        "Birth": birth,
-        "Password": password,
-
-      };
-
-      db.collection("users").add(user);
-      isAdded = true;
-
-    // }
-
-  }
-  else{
+    db.collection("users").add(user);
+    isAdded = true;
+  } else {
     isAdded = false;
+    print("not added");
   }
 
   return isAdded;

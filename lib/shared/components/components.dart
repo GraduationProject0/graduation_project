@@ -61,6 +61,7 @@ Widget defaultbutton({
   required void Function()? function,
 }) =>
     Container(
+
       width: width,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
@@ -96,7 +97,8 @@ Widget defaultItemProdect({
     ),
     height: height,
     width: width,
-    child: Icon(icon),
+    child: Icon(icon,
+    size: 28),
   ),
 );
 

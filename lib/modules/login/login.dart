@@ -1,17 +1,14 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:graduation_project/main.dart';
 import 'package:graduation_project/modules/get_id.dart';
 import 'package:graduation_project/modules/global_variable.dart';
-import 'package:graduation_project/modules/home/home.dart';
-import 'package:graduation_project/modules/home/home_2.dart';
+import 'package:graduation_project/modules/home/homescreen.dart';
+import 'package:graduation_project/modules/home/homescreen.dart';
 import 'package:graduation_project/modules/shared_preferences.dart';
 import 'package:graduation_project/modules/signup/signup.dart';
 import 'package:graduation_project/shared/components/components.dart';
-
 
 class loginScreen extends StatefulWidget {
   @override
@@ -21,15 +18,20 @@ class loginScreen extends StatefulWidget {
 class _loginScreenState extends State<loginScreen> {
   // const loginScreen({Key? key}) : super(key: key);
 
+  @override
+  void initState() {
+    // TODO: implement initState
 
+    super.initState();
+  }
 
-  var email=TextEditingController();
+  var email = TextEditingController();
 
-  var password=TextEditingController();
+  var password = TextEditingController();
 
-  var formKey=GlobalKey<FormState>();
+  var formKey = GlobalKey<FormState>();
 
-  bool obscure=true;
+  bool obscure = true;
   late QuerySnapshot nameEmailSnapshot;
   FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -37,17 +39,15 @@ class _loginScreenState extends State<loginScreen> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Color(0xFF2AB16E),
-            Color(0xFF6E2AB1),
-            Color(0xFF165C39),
-          ],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        )
-      ),
-
+          gradient: LinearGradient(
+        colors: [
+          Color(0xFF2AB16E),
+          Color(0xFF6E2AB1),
+          Color(0xFF165C39),
+        ],
+        begin: Alignment.topRight,
+        end: Alignment.bottomLeft,
+      )),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         // appBar: AppBar(),
@@ -72,7 +72,6 @@ class _loginScreenState extends State<loginScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white54,
                       borderRadius: BorderRadius.circular(20.0),
-
                     ),
                     //color: Colors.white,
                     height: 500,
@@ -83,10 +82,10 @@ class _loginScreenState extends State<loginScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Column(
-                              children:[
+                              children: [
                                 const Text(
                                   "Login",
-                                  style:TextStyle(
+                                  style: TextStyle(
                                     fontSize: 40.0,
                                     color: Colors.black,
                                     fontWeight: FontWeight.bold,
@@ -100,13 +99,13 @@ class _loginScreenState extends State<loginScreen> {
                                   label: 'E-Mail',
                                   prefix: Icons.email,
                                   type: TextInputType.emailAddress,
-                                  validate: (value){
-                                    if(value!.isEmpty){
+                                  validate: (value) {
+                                    if (value!.isEmpty) {
                                       return 'E-Mail can not be empty';
                                     }
                                     return null;
                                   },
-                                  function: (s){
+                                  function: (s) {
                                     print(email.text);
                                   },
                                 ),
@@ -118,23 +117,23 @@ class _loginScreenState extends State<loginScreen> {
                                   label: 'Password',
                                   prefix: Icons.lock,
                                   type: TextInputType.visiblePassword,
-                                  validate: (value){
-                                    if(value!.isEmpty){
+                                  validate: (value) {
+                                    if (value!.isEmpty) {
                                       return 'Password can not be empty';
                                     }
                                     return null;
                                   },
-                                  function: (ss){
+                                  function: (ss) {
                                     print(password.text);
                                   },
                                   obscure: obscure,
-                                  suffix: obscure? Icons.visibility:Icons.visibility_off,
+                                  suffix: obscure
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   sufFunction: () {
                                     setState(() {
-                                      obscure=!obscure;
-                                    }
-                                    );
-
+                                      obscure = !obscure;
+                                    });
                                   },
                                 ),
                                 const SizedBox(
@@ -143,46 +142,60 @@ class _loginScreenState extends State<loginScreen> {
                                 defaultbutton(
                                   color: Colors.black,
                                   text: 'login',
-                                  function: ()async{
-
-
-                                    if(formKey.currentState!.validate()){
-                                      try{
+                                  function: () async {
+                                    if (formKey.currentState!.validate()) {
+                                      try {
                                         nameEmailSnapshot = await db
                                             .collection('users')
-                                            .where('E-Mail', isEqualTo: email.text.toString())
-                                            .where('Password', isEqualTo: password.text.toString())
+                                            .where('E-Mail',
+                                                isEqualTo:
+                                                    email.text.toString())
+                                            .where('Password',
+                                                isEqualTo:
+                                                    password.text.toString())
                                             .get();
 
-                                        userEmail=email.text.toString();
-                                        catchid =await getID(userEmail);
-                                        saveLoginAccountToCache(catchid);
+                                        // Check if the nameEmailSnapshot has any documents
+                                        if (nameEmailSnapshot.docs.isNotEmpty) {
+                                          userEmail = email.text.toString();
+                                          catchid = await getID(userEmail);
 
-                                        userfullname=await getUserFullName(userEmail);
-                                        getPhone= await getUserphone(userEmail) ;
-                                        getBirth= await getUserbirth(userEmail) ;
-                                        //print(catchid);
-
-                                        Fluttertoast.showToast(
-                                          msg: "E-Mail or password wrong",
-                                          gravity: ToastGravity.BOTTOM,
-                                          backgroundColor: Colors.lightGreen,
-                                          textColor: Colors.white,
-                                          fontSize: 16,
-                                          timeInSecForIosWeb: 1,
-                                        );
-
-                                        print(email.text);
-                                        print(password.text);
-
-                                        Navigator.pushReplacement(
+                                          saveLoginAccountToCache(catchid);
+                                          await getUserData(catchid);
+                                          Fluttertoast.showToast(
+                                            msg: "Successfully logged in",
+                                            gravity: ToastGravity.BOTTOM,
+                                            backgroundColor: Colors.lightGreen,
+                                            textColor: Colors.white,
+                                            fontSize: 16,
+                                            timeInSecForIosWeb: 1,
+                                          );
+                                          print(email.text);
+                                          print(password.text);
+                                          Navigator.pushReplacement(
                                             context,
-                                            MaterialPageRoute(builder: (context) => HomeScreen_2(),
-                                            ));
-
-                                      }catch(e){
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HomeScreen_2(savedId),
+                                              // ,eemail,birth,fName,lName,phone
+                                            ),
+                                          );
+                                        } else {
+                                          print('1');
+                                          Fluttertoast.showToast(
+                                            msg:
+                                                "Email or password is incorrect",
+                                            gravity: ToastGravity.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                            fontSize: 16,
+                                            timeInSecForIosWeb: 1,
+                                          );
+                                        }
+                                      } catch (e) {
+                                        print('2');
                                         Fluttertoast.showToast(
-                                          msg: "E-Mail or password wrong",
+                                          msg: "Email or password is incorrect",
                                           gravity: ToastGravity.BOTTOM,
                                           backgroundColor: Colors.red,
                                           textColor: Colors.white,
@@ -191,7 +204,6 @@ class _loginScreenState extends State<loginScreen> {
                                         );
                                       }
                                     }
-
                                   },
                                 ),
                                 const SizedBox(
@@ -202,13 +214,15 @@ class _loginScreenState extends State<loginScreen> {
                                   children: [
                                     Text("don't have an account?"),
                                     TextButton(
-                                      onPressed: (){
+                                      onPressed: () {
                                         Navigator.push(
                                             context,
-                                            MaterialPageRoute(builder: (context) => signupScreen(),
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  signupScreen(),
                                             ));
-                                    },
-                                      child:Text('Register Now'),
+                                      },
+                                      child: Text('Register Now'),
                                     )
                                   ],
                                 ),
